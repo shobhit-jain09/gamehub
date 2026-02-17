@@ -41,16 +41,6 @@ function getDefaultGames() {
       addedBy: "system",
       createdAt: Date.now(),
     },
-    {
-      id: "my-github-game",
-      title: "My GitHub Game (edit me)",
-      playUrl: "https://YOUR-USERNAME.github.io/YOUR-REPO/",
-      sourceUrl: "https://github.com/YOUR-USERNAME/YOUR-REPO",
-      tags: ["my-game"],
-      thumbnailUrl: "",
-      addedBy: "system",
-      createdAt: Date.now(),
-    },
   ];
 }
 
