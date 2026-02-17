@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Hub</title>
+    <meta name="description" content="Play and share browser games." />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header__inner">
+        <div class="brand">
+          <div class="brand__logo" aria-hidden="true">GH</div>
+          <div class="brand__text">
+            <div class="brand__title">Game Hub</div>
+            <div class="brand__subtitle">Play games. Add yours.</div>
+          </div>
+        </div>
+
+        <div class="header__actions">
+          <button class="button button--secondary" id="btnOpenAddGame" type="button">
+            Add your game
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero" aria-label="Intro">
+        <div class="hero__inner">
+          <div class="hero__headline">Your games, one place.</div>
+          <div class="hero__subhead">
+            Play featured games below, or add your own. No sign-in required.
+          </div>
+          <div class="hero__ctaRow">
+            <button class="button" type="button" id="btnOpenAddGameHero">Add your game</button>
+            <div class="hero__hint">Tip: some games may open in a new tab.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="toolbar" aria-label="Filters">
+        <div class="field">
+          <label class="field__label" for="searchInput">Search</label>
+          <input
+            class="field__input"
+            id="searchInput"
+            type="search"
+            placeholder="Search by name or tag…"
+            autocomplete="off"
+          />
+        </div>
+        <div class="toolbar__meta" id="resultsMeta" aria-live="polite"></div>
+      </section>
+
+      <section>
+        <div class="grid" id="gamesGrid" aria-label="Games"></div>
+        <div class="empty" id="emptyState" hidden>
+          <div class="empty__title">No games found.</div>
+          <div class="empty__hint">Try a different search or add a new game.</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Add Game Modal -->
+    <dialog class="modal" id="addGameModal" aria-label="Add your game">
+      <form class="modal__panel" id="addGameForm" method="dialog">
+        <div class="modal__header">
+          <div>
+            <div class="modal__title">Add your game</div>
+            <div class="modal__subtitle">
+              This saves to your browser (no login). Share the link separately.
+            </div>
+          </div>
+          <button class="iconButton" id="btnCloseAddGame" type="button" aria-label="Close">
+            ✕
+          </button>
+        </div>
+
+        <div class="modal__content">
+          <div class="field">
+            <label class="field__label" for="gameTitle">Game name</label>
+            <input class="field__input" id="gameTitle" name="title" required maxlength="60" />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="gamePlayUrl">Play URL</label>
+            <input
+              class="field__input"
+              id="gamePlayUrl"
+              name="playUrl"
+              required
+              placeholder="https://example.com/game"
+            />
+            <div class="field__hint">
+              Tip: If you host on GitHub Pages, use your Pages URL (not the repo URL).
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="gameSourceUrl">Source URL (optional)</label>
+            <input
+              class="field__input"
+              id="gameSourceUrl"
+              name="sourceUrl"
+              placeholder="https://github.com/username/repo"
+            />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="gameTags">Tags (optional)</label>
+            <input
+              class="field__input"
+              id="gameTags"
+              name="tags"
+              placeholder="football, reflex, arcade"
+            />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="gameThumbnail">Thumbnail URL (optional)</label>
+            <input
+              class="field__input"
+              id="gameThumbnail"
+              name="thumbnailUrl"
+              placeholder="https://example.com/thumbnail.png"
+            />
+          </div>
+
+          <div class="error" id="addGameError" role="alert" hidden></div>
+        </div>
+
+        <div class="modal__footer">
+          <button class="button button--secondary" type="button" id="btnCancelAddGame">
+            Cancel
+          </button>
+          <button class="button" type="submit">Add game</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Play Modal -->
+    <dialog class="modal modal--wide" id="playModal" aria-label="Play game">
+      <div class="modal__panel modal__panel--wide">
+        <div class="modal__header">
+          <div class="modal__title" id="playTitle">Play</div>
+          <div class="modal__headerActions">
+            <button class="button button--secondary" id="playOpenNewTab" type="button">
+              Open in new tab
+            </button>
+            <button class="iconButton" id="btnClosePlay" type="button" aria-label="Close">
+              ✕
+            </button>
+          </div>
+        </div>
+        <div class="modal__content modal__content--play">
+          <div class="note" id="embedNote">
+            If the game doesn’t load here, it may block embedding. Use “Open in new tab”.
+          </div>
+          <iframe
+            class="playFrame"
+            id="playFrame"
+            title="Game"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+          ></iframe>
+        </div>
+      </div>
+    </dialog>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__text">
+          Built as a simple static site. Works on GitHub Pages.
+        </div>
+        <button class="linkButton" id="btnClearUserGames" type="button" title="Removes games you added on this browser">
+          Clear my added games
+        </button>
+      </div>
+    </footer>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
