@@ -1,0 +1,43 @@
+[
+  {
+    "id": "basketball",
+    "title": "Basketball",
+    "playUrl": "https://shobhit-jain09.github.io/basketball.io/basketball_game.html",
+    "sourceUrl": "",
+    "tags": ["sports", "basketball"],
+    "thumbnailUrl": "",
+    "addedBy": "system",
+    "createdAt": 1700000000000
+  },
+  {
+    "id": "reflex-ruler",
+    "title": "Reflex Ruler",
+    "playUrl": "https://shobhit-jain09.github.io/Reflex-ruler.io/reflexruler.html",
+    "sourceUrl": "",
+    "tags": ["reflex", "arcade"],
+    "thumbnailUrl": "",
+    "addedBy": "system",
+    "createdAt": 1700000000001
+  },
+  {
+    "id": "football-supercup",
+    "title": "Football — Super Cup",
+    "playUrl": "https://shobhit-jain09.github.io/football.io/supercup.html",
+    "sourceUrl": "",
+    "tags": ["sports", "football"],
+    "thumbnailUrl": "",
+    "addedBy": "system",
+    "createdAt": 1700000000002
+  },
+  {
+    "id": "balling-alley",
+    "title": "Balling Alley",
+    "playUrl": "https://shobhit-jain09.github.io/balling-alley/",
+    "sourceUrl": "",
+    "tags": ["sports", "bowling"],
+    "thumbnailUrl": "",
+    "addedBy": "system",
+    "createdAt": 1700000000003
+  }
+]
+

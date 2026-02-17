@@ -239,6 +239,8 @@ function main() {
   const btnOpenAddGame = document.getElementById("btnOpenAddGame");
   /** @type {HTMLButtonElement | null} */
   const btnOpenAddGameHero = document.getElementById("btnOpenAddGameHero");
+  /** @type {HTMLButtonElement | null} */
+  const btnSuggestGlobal = document.getElementById("btnSuggestGlobal");
   /** @type {HTMLDialogElement} */
   const addGameModal = document.getElementById("addGameModal");
   /** @type {HTMLFormElement} */
@@ -265,6 +267,7 @@ function main() {
   const btnClearUserGames = document.getElementById("btnClearUserGames");
 
   let userGames = loadUserGames();
+  /** @type {Game[]} */
   const defaultGames = getDefaultGames();
   let currentPlayUrl = "";
 
@@ -304,6 +307,36 @@ function main() {
 
     if (filtered.length === 0) show(emptyState);
     else hide(emptyState);
+  }
+
+  async function loadGlobalGames() {
+    try {
+      const res = await fetch("./games.json", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!Array.isArray(data)) return;
+
+      // Replace contents of defaultGames array in-place
+      defaultGames.length = 0;
+      for (const raw of data) {
+        if (!raw || typeof raw !== "object") continue;
+        const g = /** @type {any} */ (raw);
+        if (!g.title || !g.playUrl) continue;
+        defaultGames.push({
+          id: String(g.id || makeId()),
+          title: String(g.title),
+          playUrl: String(g.playUrl),
+          sourceUrl: g.sourceUrl ? String(g.sourceUrl) : "",
+          tags: Array.isArray(g.tags) ? g.tags.map((t) => String(t)) : [],
+          thumbnailUrl: g.thumbnailUrl ? String(g.thumbnailUrl) : "",
+          addedBy: "system",
+          createdAt: typeof g.createdAt === "number" ? g.createdAt : Date.now(),
+        });
+      }
+      render();
+    } catch {
+      // If loading fails we keep the built-in defaults
+    }
   }
 
   function openAddModal() {
@@ -399,6 +432,32 @@ function main() {
     render();
   });
 
+  btnSuggestGlobal?.addEventListener("click", openGlobalSuggestionIssue);
+
+  function openGlobalSuggestionIssue() {
+    hide(addGameError);
+    const fd = new FormData(addGameForm);
+    const title = String(fd.get("title") ?? "").trim();
+    const playUrl = String(fd.get("playUrl") ?? "").trim();
+    const tagsText = String(fd.get("tags") ?? "").trim();
+
+    if (!title) return showAddError("Please enter a game name.");
+    if (!isProbablyUrl(playUrl)) return showAddError("Play URL must be a valid http(s) URL.");
+
+    const params = new URLSearchParams({
+      labels: "game-suggestion",
+      title: `Game suggestion: ${title}`,
+      body:
+        `**Title**: ${title}\n` +
+        `**Play URL**: ${playUrl}\n` +
+        `**Tags**: ${tagsText || "(none)"}\n\n` +
+        `Requested via site form.`,
+    });
+
+    const url = `https://github.com/shobhit-jain09/gamehub/issues/new?${params.toString()}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
   gamesGrid.addEventListener("click", (e) => {
     const target = /** @type {HTMLElement} */ (e.target);
     const action = target?.getAttribute?.("data-action");
@@ -438,6 +497,8 @@ function main() {
 
   // Initial render
   render();
+  // Load global games from games.json (will re-render when loaded)
+  loadGlobalGames();
 }
 
 document.addEventListener("DOMContentLoaded", main);

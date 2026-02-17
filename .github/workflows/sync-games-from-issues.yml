@@ -1,0 +1,119 @@
+name: Sync games from issues
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  sync-games:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update games.json from game-suggestion issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const core = require('@actions/core');
+            const fs = require('fs');
+            const path = require('path');
+
+            const issue = context.payload.issue;
+            const labels = issue.labels || [];
+            const hasLabel = labels.some((l) => l.name === 'game-suggestion');
+
+            if (!hasLabel) {
+              core.info('Issue does not have game-suggestion label, skipping.');
+              return;
+            }
+
+            const body = issue.body || '';
+            const titleMatch = body.match(/\*\*Title\*\*:\s*(.+)/i);
+            const urlMatch = body.match(/\*\*Play URL\*\*:\s*(.+)/i);
+            const tagsMatch = body.match(/\*\*Tags\*\*:\s*(.+)/i);
+
+            if (!titleMatch || !urlMatch) {
+              core.setFailed('Missing Title or Play URL in issue body.');
+              return;
+            }
+
+            const title = titleMatch[1].trim();
+            const playUrl = urlMatch[1].trim();
+            const tags = tagsMatch
+              ? tagsMatch[1].split(',').map((t) => t.trim()).filter(Boolean)
+              : [];
+
+            function slugify(text) {
+              return (
+                text
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, '-')
+                  .replace(/^-+|-+$/g, '')
+                  .slice(0, 40) || 'game'
+              );
+            }
+
+            const jsonPath = path.join(process.cwd(), 'games.json');
+            let games = [];
+            if (fs.existsSync(jsonPath)) {
+              const raw = fs.readFileSync(jsonPath, 'utf8') || '[]';
+              games = JSON.parse(raw);
+            }
+
+            const idBase = slugify(title);
+            let id = idBase;
+            let i = 1;
+            const existingIds = new Set(games.map((g) => g.id));
+            while (existingIds.has(id)) {
+              id = `${idBase}-${i++}`;
+            }
+
+            games.push({
+              id,
+              title,
+              playUrl,
+              sourceUrl: '',
+              tags,
+              thumbnailUrl: '',
+              addedBy: 'system',
+              createdAt: Date.now()
+            });
+
+            fs.writeFileSync(jsonPath, JSON.stringify(games, null, 2));
+
+      - name: Commit and push changes (if any)
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games.json
+          git commit -m "Add game from issue #${{ github.event.issue.number }}"
+          git push
+
+      - name: Comment and close issue
+        if: ${{ !cancelled() }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: 'Your game has been added to the global list and will appear on the site after the next deploy.'
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              state: 'closed'
+            });
+
