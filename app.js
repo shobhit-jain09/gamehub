@@ -41,6 +41,16 @@ function getDefaultGames() {
       addedBy: "system",
       createdAt: Date.now(),
     },
+    {
+      id: "balling-alley",
+      title: "Balling Alley",
+      playUrl: "https://shobhit-jain09.github.io/balling-alley/",
+      sourceUrl: "",
+      tags: ["sports", "bowling"],
+      thumbnailUrl: "",
+      addedBy: "system",
+      createdAt: Date.now(),
+    },
   ];
 }
 
