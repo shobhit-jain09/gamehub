@@ -263,9 +263,6 @@ function main() {
   /** @type {HTMLButtonElement} */
   const btnClosePlay = document.getElementById("btnClosePlay");
 
-  /** @type {HTMLButtonElement} */
-  const btnClearUserGames = document.getElementById("btnClearUserGames");
-
   let userGames = loadUserGames();
   /** @type {Game[]} */
   const defaultGames = getDefaultGames();
@@ -485,14 +482,6 @@ function main() {
   playModal.addEventListener("click", (e) => {
     // Click on the backdrop (dialog itself) closes
     if (e.target === playModal) closePlay();
-  });
-
-  btnClearUserGames.addEventListener("click", () => {
-    const ok = confirm("Remove all games you added on this browser?");
-    if (!ok) return;
-    userGames = [];
-    saveUserGames(userGames);
-    render();
   });
 
   // Initial render
